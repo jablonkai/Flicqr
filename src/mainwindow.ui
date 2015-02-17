@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>910</width>
+    <height>594</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Flicqr</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QSplitter" name="verticalSplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QTreeView" name="photosetsView">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <property name="itemsExpandable">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QSplitter" name="splitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QTreeView" name="photosView"/>
+       <widget class="QGroupBox" name="testGroupBox">
+        <property name="title">
+         <string>Test</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="1">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Minimum</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="sendPushButton">
+           <property name="text">
+            <string>Send</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLineEdit" name="requestLineEdit"/>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QTextEdit" name="responseTextEdit">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>910</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="action_Authenticate"/>
+    <addaction name="separator"/>
+    <addaction name="actionE_xit"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_About"/>
+    <addaction name="actionAbout_Qt"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionPhotosets"/>
+    <addaction name="actionDownload_photoset"/>
+   </widget>
+   <addaction name="menu_File"/>
+   <addaction name="menu_Help"/>
+   <addaction name="menuTools"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionE_xit"/>
+   <addaction name="separator"/>
+   <addaction name="action_Authenticate"/>
+   <addaction name="separator"/>
+   <addaction name="actionPhotosets"/>
+   <addaction name="actionDownload_photoset"/>
+  </widget>
+  <action name="actionE_xit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About &amp;Qt</string>
+   </property>
+  </action>
+  <action name="action_Authenticate">
+   <property name="text">
+    <string>&amp;Authenticate...</string>
+   </property>
+  </action>
+  <action name="actionPhotosets">
+   <property name="text">
+    <string>Photoset</string>
+   </property>
+   <property name="toolTip">
+    <string>Photosets</string>
+   </property>
+  </action>
+  <action name="actionDownload_photoset">
+   <property name="text">
+    <string>Download photoset</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
