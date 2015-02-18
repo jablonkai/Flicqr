@@ -1,11 +1,13 @@
 #include "flickrapi.h"
 
 #include <liboauthcpp/liboauthcpp.h>
+#include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QProgressDialog>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
@@ -13,8 +15,6 @@
 
 #include "photosetsmodel.h"
 #include "settings.h"
-
-#include <iostream>
 
 FlickrAPI::FlickrAPI(QObject *parent) :
     QObject(parent)
@@ -37,6 +37,7 @@ FlickrAPI::FlickrAPI(QObject *parent) :
 FlickrAPI::~FlickrAPI()
 {
     delete netAccessManager;
+    delete pDialog;
     delete client;
     delete photosets;
 }
@@ -90,16 +91,13 @@ void FlickrAPI::getPhotosetsList()
 
 void FlickrAPI::downloadPhotoset(const QString &directory)
 {
+    photosets->activeSet()->setFolder(directory);
     QList<Photo*> photos = photosets->activeSet()->photoList();
+    pDialog = new QProgressDialog(tr("photos downloading..."), tr("Cancel"), 1, photos.size());
+    pDialog->setWindowModality(Qt::ApplicationModal);
+    pDialog->show();
     foreach (Photo *photo, photos)
         sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getSizes&photo_id=" + photo->id().toStdString()).c_str()));
-}
-
-void FlickrAPI::sendRequest(const QString &request)
-{
-    QUrl requestUrl(request);
-    QNetworkRequest netRequest(requestUrl);
-    netAccessManager->get(netRequest);
 }
 
 void FlickrAPI::activated(const QModelIndex &index)
@@ -109,26 +107,27 @@ void FlickrAPI::activated(const QModelIndex &index)
     sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getphotos&photoset_id=" + photosets->activeSet()->id().toStdString()).c_str()));
 }
 
+void FlickrAPI::sendRequest(const QString &request)
+{
+    QUrl requestUrl(request);
+    QNetworkRequest netRequest(requestUrl);
+    netAccessManager->get(netRequest);
+}
+
 void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 {
+    if (reply->url().toString().endsWith(".jpg"))
+    {
+        saveToDisk(reply->url().toString().split("/").last(), reply);
+        pDialog->setValue(pDialog->value() + 1);
+        reply->deleteLater();
+        return;
+    }
+
     QJsonDocument jsonDocument = QJsonDocument::fromJson(reply->readAll());
     QJsonObject jsonObject = jsonDocument.object();
     QJsonObject jsonData;
-
     QString key = jsonObject.keys().first();
-
-//    QJsonValue jsonValue;
-//    QJsonArray jsonArray;
-//    std::cout << qHash(key) << std::endl;
-
-/*    switch (qHash(key))
-    {
-    case 'user':
-        std::cout << "hö" << std::endl;
-        break;
-    default:
-        break;
-    }*/
 
     if (key == "user")
     {
@@ -166,9 +165,31 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
         QJsonObject lastObject = jsonArray.last().toObject();
         QString source = lastObject["source"].toString();
 
-
-        std::cout << source.toStdString() << std::endl;
+        sendRequest(source);
     }
 
+    reply->deleteLater();
     emit sendResponse(QString::fromUtf8(jsonDocument.toJson()));
+}
+
+void FlickrAPI::saveToDisk(QString fName, QIODevice *data)
+{
+    QFile file(photosets->activeSet()->folder() + "/" + fName);
+    file.open(QIODevice::WriteOnly);
+    file.write(data->readAll());
+    file.close();
+
+
+    /*    QFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
+        fprintf(stderr, "Could not open %s for writing: %s\n",
+                qPrintable(filename),
+                qPrintable(file.errorString()));
+        return false;
+    }
+
+    file.write(data->readAll());
+    file.close();
+
+    return true;*/
 }

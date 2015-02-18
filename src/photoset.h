@@ -37,6 +37,9 @@ public:
     void setTitle(const QString &__title) { _title = __title; }
     QString title() const { return _title; }
 
+    void setFolder(const QString &_folder) { localFolder = _folder; }
+    QString folder() const { return localFolder; }
+
     QList<Photo*> photoList() const { return photos; }
 
 private:
@@ -45,6 +48,7 @@ private:
     uint _videos;
     QString _title;
     QString _description;
+    QString localFolder;
 
     QList<Photo*> photos;
 };

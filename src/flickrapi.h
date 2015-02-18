@@ -6,8 +6,10 @@
 #define API_KEY "0097a0e5e60f69a177e0d0dfa0bb9c6a"
 #define API_SECRET "5b2e1d4c168eccb1"
 
+class QIODevice;
 class QNetworkAccessManager;
 class QNetworkReply;
+class QProgressDialog;
 
 class Photoset;
 class PhotosetsModel;
@@ -44,9 +46,12 @@ private slots:
 
 private:
     QNetworkAccessManager *netAccessManager;
+    QProgressDialog *pDialog;
     OAuth::Client *client;
     QString flickrRestUrl;
     PhotosetsModel *photosets;
+
+    void saveToDisk(QString fName, QIODevice *data);
 };
 
 #endif // FLICKRAPI_H
