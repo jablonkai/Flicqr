@@ -130,8 +130,8 @@
     <addaction name="actionDownload_photoset"/>
    </widget>
    <addaction name="menu_File"/>
-   <addaction name="menu_Help"/>
    <addaction name="menuTools"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
