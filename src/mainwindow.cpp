@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(ui->requestLineEdit, SIGNAL(returnPressed()), this, SLOT(on_sendPushButton_clicked()));
     connect(flickrAPI, SIGNAL(sendResponse(QString)), ui->responseTextEdit, SLOT(setText(QString)));
+    connect(flickrAPI, SIGNAL(photoSetActivated(Photoset*)), this, SLOT(photoSetActivated(Photoset*)));
     connect(ui->photosetsView, SIGNAL(activated(QModelIndex)), flickrAPI, SLOT(activated(QModelIndex)));
 
     show();
@@ -55,12 +56,20 @@ void MainWindow::on_actionDownload_photoset_triggered()
 {
     QString directory = QFileDialog::getExistingDirectory(this, "Directory to save the album");
 //    QModelIndex currentIndex = ui->photosetsView->selectionModel()->currentIndex();
-    flickrAPI->downloadPhotoset(directory);
+    if (!directory.isEmpty())
+        flickrAPI->downloadPhotoset(directory);
 }
 
 void MainWindow::on_action_About_triggered()
 {
-    QMessageBox::about(this, tr("About Flicqr"), QString::fromUtf8("<b>Flicqr</b><br>Version " FLICQR_VERSION "<br>Copyright (C) 2014 by Tamás Jablonkai<br><a href=\"mailto:tamas.jablonkai@gmail.com\">tamas.jablonkai@gmail.com</a>"));
+    QMessageBox::about(this, tr("About Flicqr"), QString::fromUtf8("<b>Flicqr</b><br>Version " FLICQR_VERSION "<br>Copyright (C) 2015 by Tamás Jablonkai<br><a href=\"mailto:tamas.jablonkai@gmail.com\">tamas.jablonkai@gmail.com</a>"));
+}
+
+void MainWindow::photoSetActivated(Photoset *photoset)
+{
+    if (!photoset)
+        return;
+    ui->photosView->setModel(photoset);
 }
 
 void MainWindow::readSettings()
@@ -98,5 +107,3 @@ void MainWindow::writeSettings()
     conf.setValue("oauthTokenSecret", Settings::instance()->oauthTokenSecret());
     conf.endGroup();
 }
-
-

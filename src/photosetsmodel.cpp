@@ -14,8 +14,6 @@ QVariant PhotosetsModel::data(const QModelIndex &index, int role) const
     {
         if (index.column() == 0)
             return photosetList.at(index.row())->title();
-//        if (index.column() == 1)
-//            return photosetList.at(index.row()).translated;
     }
     else
         return QVariant();
@@ -38,9 +36,8 @@ Qt::ItemFlags PhotosetsModel::flags(const QModelIndex &index) const
     if (!index.isValid())
         return Qt::ItemIsEnabled;
 
-    return QAbstractItemModel::flags(index); // | Qt::ItemIsEditable;
+    return QAbstractItemModel::flags(index);
 }
-
 
 bool PhotosetsModel::insertRows(int position, int rows, const QModelIndex &index)
 {
@@ -54,15 +51,7 @@ QString PhotosetsModel::currentID(const QModelIndex &index) const
     if (!index.isValid() || index.row() >= photosetList.size())
         return QString();
 
-    //if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
-//    {
- //       if (index.column() == 0)
-            return photosetList.at(index.row())->id();
-//        if (index.column() == 1)
-//            return photosetList.at(index.row()).translated;
-  //  }
-    //else
-      //  return QString();
+    return photosetList.at(index.row())->id();
 }
 
 void PhotosetsModel::clear()
@@ -74,9 +63,6 @@ void PhotosetsModel::addPhotoset(Photoset *photoset)
 {
     insertRows(rowCount(QModelIndex()), 1);
     photosetList.append(photoset);
-/*    insertRows(rowCount(QModelIndex()), 1);
-    list.append(entry);
-    setSaved(false);*/
 }
 
 void PhotosetsModel::activateSet(const QModelIndex &index)

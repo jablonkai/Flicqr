@@ -24,17 +24,6 @@ public:
 
     QString currentID(const QModelIndex &index) const;
 
-/*    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const { return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex(); }
-    QModelIndex parent(const QModelIndex&) const { return QModelIndex(); }
-    int columnCount (const QModelIndex&) const { return 2; }
-    int rowCount(const QModelIndex&) const { return list.count(); }
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-    bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
-    bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()); */
-
     void clear();
     void addPhotoset(Photoset *photoset);
 

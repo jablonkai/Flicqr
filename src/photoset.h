@@ -7,11 +7,29 @@
 
 #include "photo.h"
 
-class Photoset// : public QAbstractItemModel
+class Photoset : public QAbstractItemModel
 {
+    Q_OBJECT
+
 public:
     Photoset();
     Photoset(const QString &__id, const QString __title) : _id(__id), _title(__title) {}
+
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const { return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex(); }
+    QModelIndex parent(const QModelIndex &child) const { return QModelIndex(); }
+    int rowCount(const QModelIndex &parent) const { return photos.count(); }
+    int columnCount(const QModelIndex &parent) const { return 1; }
+    QVariant data(const QModelIndex &index, int role) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) {}
+    bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
+    bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex()) {}
+
+    QString currentID(const QModelIndex &index) const;
+
+    void clear();
+    void addPhoto(Photo *photo);
 
     void setID(const QString &__id) { _id = __id; }
     QString id() const { return _id; }
@@ -19,7 +37,7 @@ public:
     void setTitle(const QString &__title) { _title = __title; }
     QString title() const { return _title; }
 
-    void addPhoto(const Photo &_photo) { photos.push_back(_photo); }
+    QList<Photo*> photoList() const { return photos; }
 
 private:
     QString _id;
@@ -28,7 +46,7 @@ private:
     QString _title;
     QString _description;
 
-//    QList<Photo> photos;
+    QList<Photo*> photos;
 };
 
 #endif // PHOTOSET_H

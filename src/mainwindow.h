@@ -5,6 +5,8 @@
 
 #define FLICQR_VERSION "0.1"
 
+class Photoset;
+
 namespace Ui {
 class MainWindow;
 }
@@ -24,10 +26,9 @@ private slots:
     void on_action_Authenticate_triggered();
     void on_action_About_triggered();
     void on_actionPhotosets_triggered();
-
     void on_actionDownload_photoset_triggered();
 
-
+    void photoSetActivated(Photoset *photoset);
 
 private:
     Ui::MainWindow *ui;

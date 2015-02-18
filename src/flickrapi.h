@@ -9,6 +9,7 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
+class Photoset;
 class PhotosetsModel;
 
 namespace OAuth {
@@ -33,6 +34,7 @@ public:
 
 signals:
     void sendResponse(const QString &response);
+    void photoSetActivated(Photoset *album);
 
 public slots:
     void activated(const QModelIndex &index);
@@ -41,20 +43,9 @@ private slots:
     void parseNetworkReply(QNetworkReply *reply);
 
 private:
-    enum RequestType
-    {
-        REQ_NULL,
-        REQ_PHOTOS_GETSIZES,
-        REQ_PHOTOSETS_GETINFO,
-        REQ_PHOTOSETS_GETLIST,
-        REQ_PHOTOSETS_GETPHOTOS,
-        REQ_TEST_LOGIN
-    };
-
     QNetworkAccessManager *netAccessManager;
     OAuth::Client *client;
     QString flickrRestUrl;
-    RequestType reqType;
     PhotosetsModel *photosets;
 };
 
