@@ -28,6 +28,7 @@ public:
     void addPhotoset(Photoset *photoset);
 
     Photoset *activeSet() const { return activePhotoset; }
+    Photoset *byId(const QString id) const { return 0; }
     void activateSet(const QModelIndex &index);
 
 signals:

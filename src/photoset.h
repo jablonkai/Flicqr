@@ -48,6 +48,7 @@ private:
     uint _videos;
     QString _title;
     QString _description;
+
     QString localFolder;
 
     QList<Photo*> photos;

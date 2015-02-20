@@ -7,11 +7,11 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QInputDialog>
 #include <QtGui/QProgressDialog>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
-#include <QtWidgets/QInputDialog>
 
 #include "photosetsmodel.h"
 #include "settings.h"
@@ -121,6 +121,7 @@ void FlickrAPI::sendRequest(const QString &request)
 void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 {
     QString reqUrl = reply->url().toString();
+    std::cout << reqUrl.toStdString() << std::endl;
 
     if (reqUrl.endsWith(".jpg"))
     {
@@ -142,7 +143,8 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
     }
     else if (reqUrl.contains("method=flickr.photos.getInfo"))
     {
-        std::cout << "photo get info" << std::endl;
+        jsonData = jsonObject["photo"].toObject();
+//        std::cout << "photo get info" << std::endl;
     }
     else if (reqUrl.contains("method=flickr.photos.getSizes"))
     {
@@ -155,7 +157,9 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
     }
     else if (reqUrl.contains("method=flickr.photosets.getInfo"))
     {
-        std::cout << "photoSet get info" << std::endl;
+        jsonData = jsonObject["photoset"].toObject();
+//        QJsonArray jsonArray = jsonData["photoset"].toArray();
+//        std::cout << "photoSet get info" << std::endl;
     }
     else if (reqUrl.contains("method=flickr.photosets.getList"))
     {
