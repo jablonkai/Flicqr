@@ -36,6 +36,7 @@ public:
 
     void setTitle(const QString &__title) { _title = __title; }
     QString title() const { return _title; }
+    QString titleById(const QString _id) const { foreach(Photo *photo, photos) if(photo->id() == _id) return photo->title(); return 0; }
 
     void setFolder(const QString &_folder) { localFolder = _folder; }
     QString folder() const { return localFolder; }

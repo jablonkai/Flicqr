@@ -43,6 +43,7 @@ public slots:
 
 private slots:
     void parseNetworkReply(QNetworkReply *reply);
+    void dowloadCanceled();
 
 private:
     QNetworkAccessManager *netAccessManager;

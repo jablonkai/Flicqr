@@ -16,8 +16,6 @@
 #include "photosetsmodel.h"
 #include "settings.h"
 
-#include <iostream>
-
 FlickrAPI::FlickrAPI(QObject *parent) :
     QObject(parent)
 {
@@ -97,6 +95,7 @@ void FlickrAPI::downloadPhotoset(const QString &directory)
     QList<Photo*> photos = photosets->activeSet()->photoList();
 
     pDialog = new QProgressDialog(tr("photos downloading..."), tr("Cancel"), 1, photos.size());
+    connect(pDialog, SIGNAL(canceled()), this, SLOT(dowloadCanceled()));
     pDialog->setWindowModality(Qt::ApplicationModal);
     pDialog->show();
 
@@ -106,6 +105,7 @@ void FlickrAPI::downloadPhotoset(const QString &directory)
 
 void FlickrAPI::activated(const QModelIndex &index)
 {
+    netAccessManager->clearAccessCache();
     photosets->activateSet(index);
     photosets->activeSet()->clear();
     sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getPhotos&photoset_id=" + photosets->activeSet()->id().toStdString()).c_str()));
@@ -121,11 +121,12 @@ void FlickrAPI::sendRequest(const QString &request)
 void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 {
     QString reqUrl = reply->url().toString();
-    std::cout << reqUrl.toStdString() << std::endl;
 
-    if (reqUrl.endsWith(".jpg"))
+    if (reqUrl.contains("staticflickr"))
     {
-        saveToDisk(reply->url().toString().split("/").last(), reply);
+        QString fName = reply->url().toString().split("/").last().split("_").first();
+        fName = photosets->activeSet()->titleById(fName);
+        saveToDisk(fName, reply);
         pDialog->setValue(pDialog->value() + 1);
         reply->deleteLater();
         return;
@@ -137,53 +138,56 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 
     if (reqUrl.contains("method=flickr.test.login"))
     {
-        jsonData = jsonObject["user"].toObject();
-        Settings::instance()->setUserID(jsonData["id"].toString());
-        Settings::instance()->setUserName(jsonData["username"].toObject()["_content"].toString());
+        jsonData = jsonObject.value("user").toObject();
+        Settings::instance()->setUserID(jsonData.value("id").toString());
+        Settings::instance()->setUserName(jsonData.value("username").toObject().value("_content").toString());
     }
-    else if (reqUrl.contains("method=flickr.photos.getInfo"))
-    {
-        jsonData = jsonObject["photo"].toObject();
+//    else if (reqUrl.contains("method=flickr.photos.getInfo"))
+//    {
+//        jsonData = jsonObject.value("photo").toObject();
 //        std::cout << "photo get info" << std::endl;
-    }
+//    }
     else if (reqUrl.contains("method=flickr.photos.getSizes"))
     {
-        jsonData = jsonObject["sizes"].toObject();
-        QJsonArray jsonArray = jsonData["size"].toArray();
-        QJsonObject lastObject = jsonArray.last().toObject();
-        QString source = lastObject["source"].toString();
+        jsonData = jsonObject.value("sizes").toObject();
+        QJsonArray jsonArray = jsonData.value("size").toArray();
 
-        sendRequest(source);
+        for(int i = 0; i < jsonArray.size(); ++i)
+            if(jsonArray[i].toObject().value("label").toString() == "Original")
+            {
+                QString source = jsonArray[i].toObject().value("source").toString();
+                sendRequest(source);
+                return;
+            }
     }
-    else if (reqUrl.contains("method=flickr.photosets.getInfo"))
-    {
-        jsonData = jsonObject["photoset"].toObject();
-//        QJsonArray jsonArray = jsonData["photoset"].toArray();
+//    else if (reqUrl.contains("method=flickr.photosets.getInfo"))
+//    {
+//        jsonData = jsonObject.value("photoset").toObject();
+//        QJsonArray jsonArray = jsonData.value("photoset").toArray();
 //        std::cout << "photoSet get info" << std::endl;
-    }
+//    }
     else if (reqUrl.contains("method=flickr.photosets.getList"))
     {
-        jsonData = jsonObject["photosets"].toObject();
-        QJsonArray jsonArray = jsonData["photoset"].toArray();
+        jsonData = jsonObject.value("photosets").toObject();
+        QJsonArray jsonArray = jsonData.value("photoset").toArray();
 
         for (int i = 0; i < jsonArray.size(); ++i)
         {
             QJsonObject iObject = jsonArray[i].toObject();
             photosets->addPhotoset(new Photoset(iObject["id"].toString(), iObject["title"].toObject()["_content"].toString()));
-            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getInfo&photoset_id=" + iObject["id"].toString().toStdString()).c_str()));
+//            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getInfo&photoset_id=" + iObject["id"].toString().toStdString()).c_str()));
         }
     }
     else if (reqUrl.contains("method=flickr.photosets.getPhotos"))
     {
-        jsonData = jsonObject["photoset"].toObject();
-        QJsonArray jsonArray = jsonData["photo"].toArray();
-        Photoset *workingSet = photosets->activeSet();
+        jsonData = jsonObject.value("photoset").toObject();
+        QJsonArray jsonArray = jsonData.value("photo").toArray();
 
         for (int i = 0; i < jsonArray.size(); ++i)
         {
             QJsonObject iObject = jsonArray[i].toObject();
-            workingSet->addPhoto(new Photo(iObject["id"].toString(), iObject["title"].toString()));
-            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getInfo&photo_id=" + iObject["id"].toString().toStdString()).c_str()));
+            photosets->activeSet()->addPhoto(new Photo(iObject["id"].toString(), iObject["title"].toString()));
+//            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getInfo&photo_id=" + iObject["id"].toString().toStdString()).c_str()));
         }
         emit photoSetActivated(photosets->activeSet());
     }
@@ -192,9 +196,14 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
     emit sendResponse(QString::fromUtf8(jsonDocument.toJson()));
 }
 
+void FlickrAPI::dowloadCanceled()
+{
+    netAccessManager->clearAccessCache();
+}
+
 void FlickrAPI::saveToDisk(QString fName, QIODevice *data)
 {
-    QFile file(photosets->activeSet()->folder() + "/" + fName);
+    QFile file(photosets->activeSet()->folder() + "/" + fName + "jpg");
     file.open(QIODevice::WriteOnly);
     file.write(data->readAll());
     file.close();
