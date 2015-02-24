@@ -8,6 +8,7 @@
 #include <QtCore/QUrl>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QInputDialog>
+#include <QtGui/QMessageBox>
 #include <QtGui/QProgressDialog>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -17,7 +18,7 @@
 #include "settings.h"
 
 FlickrAPI::FlickrAPI(QObject *parent) :
-    QObject(parent)
+    QObject(parent), pDialog(NULL)
 {
     netAccessManager = new QNetworkAccessManager(this);
     photosets = new PhotosetsModel;
@@ -37,7 +38,7 @@ FlickrAPI::FlickrAPI(QObject *parent) :
 FlickrAPI::~FlickrAPI()
 {
     delete netAccessManager;
-//    delete pDialog;
+    delete pDialog;
     delete client;
     delete photosets;
 }
@@ -91,6 +92,12 @@ void FlickrAPI::getPhotosetsList()
 
 void FlickrAPI::downloadPhotoset(const QString &directory)
 {
+    if (photosets->activeSet() == NULL)
+    {
+        QMessageBox::warning(0, tr("Warning"), tr("Please select an album first!"));
+        return;
+    }
+
     photosets->activeSet()->setFolder(directory);
     QList<Photo*> photos = photosets->activeSet()->photoList();
 
@@ -152,11 +159,12 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
         jsonData = jsonObject.value("sizes").toObject();
         QJsonArray jsonArray = jsonData.value("size").toArray();
 
-        for(int i = 0; i < jsonArray.size(); ++i)
-            if(jsonArray[i].toObject().value("label").toString() == "Original")
+        for (int i = 0; i < jsonArray.size(); ++i)
+            if (jsonArray[i].toObject().value("label").toString() == "Original")
             {
                 QString source = jsonArray[i].toObject().value("source").toString();
                 sendRequest(source);
+                reply->deleteLater();
                 return;
             }
     }
@@ -203,7 +211,7 @@ void FlickrAPI::dowloadCanceled()
 
 void FlickrAPI::saveToDisk(QString fName, QIODevice *data)
 {
-    QFile file(photosets->activeSet()->folder() + "/" + fName + "jpg");
+    QFile file(photosets->activeSet()->folder() + "/" + fName + ".jpg");
     file.open(QIODevice::WriteOnly);
     file.write(data->readAll());
     file.close();

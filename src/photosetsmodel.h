@@ -10,6 +10,7 @@ class PhotosetsModel : public QAbstractItemModel
     Q_OBJECT
 public:
     explicit PhotosetsModel(QObject *parent = 0);
+    ~PhotosetsModel();
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const { return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex(); }
     QModelIndex parent(const QModelIndex &child) const { return QModelIndex(); }

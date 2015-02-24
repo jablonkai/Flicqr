@@ -1,8 +1,13 @@
 #include "photosetsmodel.h"
 
 PhotosetsModel::PhotosetsModel(QObject *parent) :
-    QAbstractItemModel(parent)
+    QAbstractItemModel(parent), activePhotoset(NULL)
 {
+}
+
+PhotosetsModel::~PhotosetsModel()
+{
+    delete activePhotoset;
 }
 
 QVariant PhotosetsModel::data(const QModelIndex &index, int role) const
