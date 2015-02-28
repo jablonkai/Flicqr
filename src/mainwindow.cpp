@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionE_xit, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(ui->actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(ui->requestLineEdit, SIGNAL(returnPressed()), this, SLOT(on_sendPushButton_clicked()));
     connect(flickrAPI, SIGNAL(sendResponse(QString)), ui->responseTextEdit, SLOT(setText(QString)));
     connect(flickrAPI, SIGNAL(photoSetActivated(Photoset*)), this, SLOT(photoSetActivated(Photoset*)));
     connect(ui->photosetsView, SIGNAL(activated(QModelIndex)), flickrAPI, SLOT(activated(QModelIndex)));
@@ -34,12 +33,6 @@ MainWindow::~MainWindow()
 
     delete flickrAPI;
     delete ui;
-}
-
-void MainWindow::on_sendPushButton_clicked()
-{
-    ui->responseTextEdit->clear();
-    flickrAPI->sendRequest(ui->requestLineEdit->text());
 }
 
 void MainWindow::on_action_Authenticate_triggered()

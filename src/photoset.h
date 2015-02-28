@@ -18,7 +18,7 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const { return hasIndex(row, column, parent) ? createIndex(row, column) : QModelIndex(); }
     QModelIndex parent(const QModelIndex &child) const { return QModelIndex(); }
     int rowCount(const QModelIndex &parent) const { return photos.count(); }
-    int columnCount(const QModelIndex &parent) const { return 1; }
+    int columnCount(const QModelIndex &parent) const { return 3; }
     QVariant data(const QModelIndex &index, int role) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     Qt::ItemFlags flags(const QModelIndex &index) const;

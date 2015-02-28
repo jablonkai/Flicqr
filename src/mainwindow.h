@@ -22,7 +22,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_sendPushButton_clicked();
     void on_action_Authenticate_triggered();
     void on_action_About_triggered();
     void on_actionPhotosets_triggered();

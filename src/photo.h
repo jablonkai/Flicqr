@@ -1,6 +1,7 @@
 #ifndef PHOTO_H
 #define PHOTO_H
 
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
 
 class Photo
@@ -14,6 +15,10 @@ public:
 
     void setTitle(const QString &__title) { _title = __title; }
     QString title() const { return _title; }
+
+    int size() const { return 614; }
+
+    QDateTime dateTaken() const { return QDateTime(QDate(2014, 12, 7), QTime(17, 23, 20)); }
 
 private:
     QString _id;
