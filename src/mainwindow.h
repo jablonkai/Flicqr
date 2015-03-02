@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QMainWindow>
 
-#define FLICQR_VERSION "0.1"
+#define FLICQR_VERSION "0.2"
 
 class Photoset;
 

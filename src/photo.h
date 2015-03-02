@@ -16,21 +16,24 @@ public:
     void setTitle(const QString &__title) { _title = __title; }
     QString title() const { return _title; }
 
-    int size() const { return 614; }
+    void setSize(const int &s) { _size = s; }
+    int size() const { return _size; }
 
-    QDateTime dateTaken() const { return QDateTime(QDate(2014, 12, 7), QTime(17, 23, 20)); }
+    void setDateTaken(const QDateTime &t) { _taken = t; }
+    QDateTime dateTaken() const { return _taken; }
 
 private:
     QString _id;
     QString _title;
-    QString _farmId;
-    QString _serverId;
-    QString _originalsecret;
-    QString _originalformat;
+    int _size;
+    QDateTime _taken;
+    bool _isPublic;
+    bool _isFriend;
+    bool _isFamily;
 };
 
 #endif // PHOTO_H
-// https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{o-secret}_o.(jpg|gif|png)
+
 /*{ "photo":
  * { "id": "15788651237",
  * "secret": "01476d09c3",

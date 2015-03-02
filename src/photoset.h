@@ -32,46 +32,74 @@ public:
     void addPhoto(Photo *photo);
 
     void setID(const QString &__id) { _id = __id; }
-    QString id() const { return _id; }
+    QString ID() const { return _id; }
 
     void setTitle(const QString &__title) { _title = __title; }
     QString title() const { return _title; }
-    QString titleById(const QString _id) const { foreach(Photo *photo, photos) if(photo->id() == _id) return photo->title(); return 0; }
+
+    void setPhotoCount(const int n) { _photos = n; }
+    int photoCount() const { return _photos; }
+
+    void setVideoCount(const int n) { _videos = n; }
+    int videoCount() const { return _videos; }
+
+    void setDescription(const QString desc) { _description = desc; }
+    QString description() const { return _description; }
+
+    void setCreatedDate(const QDateTime created) { _create = created; }
+    QDateTime createdDate() const { return _create; }
+
+    void setUpdatedDate(const QDateTime updated) { _update = updated; }
+    QDateTime updatedDate() const { return _update; }
 
     void setFolder(const QString &_folder) { localFolder = _folder; }
     QString folder() const { return localFolder; }
 
     QList<Photo*> photoList() const { return photos; }
+    QString titleByID(const QString _id) const { foreach(Photo *photo, photos) if(photo->id() == _id) return photo->title(); return 0; }
 
 private:
     QString _id;
-    uint _photos;
-    uint _videos;
     QString _title;
+    int _photos;
+    int _videos;
     QString _description;
+    QDateTime _create;
+    QDateTime _update;
 
     QString localFolder;
 
+    Photo *primaryPhoto;
     QList<Photo*> photos;
 };
 
 #endif // PHOTOSET_H
 
-/*
- {"id":"72157648334181328",
-"primary":"15343017349",
-"secret":"8e5c1a8778",
-"server":"3942",
-"farm":4,
-"photos":"58",
-"videos":0,
-"title":{"_content":"2014-10-11 - No meg\u00e1llj csak! 38"},
-"description":{"_content":""},
-"needs_interstitial":0,
-"visibility_can_see_set":1,
-"count_views":"2",
-"count_comments":"0",
-"can_comment":1,
-"date_create":"1413231750",
-"date_update":"1413233131"}
- */
+/*{
+    "photoset": {
+        "can_comment": 1,
+        "count_comments": "0",
+        "count_photos": "16",
+        "count_videos": 0,
+        "count_views": "1",
+        "coverphoto_farm": 0,
+        "coverphoto_server": "0",
+        "date_create": "1263592174",
+        "date_update": "1412715273",
+        "description": {
+            "_content": ""
+        },
+        "farm": 5,
+        "id": "72157623217139176",
+        "owner": "23924687@N08",
+        "photos": 16,
+        "primary": "4276831181",
+        "secret": "f743edb86b",
+        "server": "4010",
+        "title": {
+            "_content": "home"
+        },
+        "username": "Jablonkai Tamás"
+    },
+    "stat": "ok"
+}*/

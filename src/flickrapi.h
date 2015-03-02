@@ -40,6 +40,7 @@ signals:
 
 public slots:
     void activated(const QModelIndex &index);
+    void photoActivated(const QModelIndex &index);
 
 private slots:
     void parseNetworkReply(QNetworkReply *reply);

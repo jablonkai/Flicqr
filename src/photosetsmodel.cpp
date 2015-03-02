@@ -15,10 +15,15 @@ QVariant PhotosetsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() >= photosetList.size())
         return QVariant();
 
-    if (role == Qt::DisplayRole || role == Qt::ToolTipRole)
+    if (role == Qt::DisplayRole)
     {
         if (index.column() == 0)
             return photosetList.at(index.row())->title();
+    }
+    else if (role == Qt::ToolTipRole)
+    {
+        if (index.column() == 0)
+            return QString("Photos: %1\nVideos: %2\nCreated on: %3\nUpdated on: %4").arg(photosetList.at(index.row())->photoCount()).arg(photosetList.at(index.row())->videoCount()).arg(photosetList.at(index.row())->createdDate().toString()).arg(photosetList.at(index.row())->updatedDate().toString());
     }
     else
         return QVariant();
@@ -30,8 +35,10 @@ QVariant PhotosetsModel::headerData(int section, Qt::Orientation orientation, in
         return QVariant();
 
     if (orientation == Qt::Horizontal)
+    {
         if (section == 0)
             return tr("Photosets");
+    }
     else
         return QString("%1").arg(section);
 }
@@ -56,7 +63,7 @@ QString PhotosetsModel::currentID(const QModelIndex &index) const
     if (!index.isValid() || index.row() >= photosetList.size())
         return QString();
 
-    return photosetList.at(index.row())->id();
+    return photosetList.at(index.row())->ID();
 }
 
 void PhotosetsModel::clear()
