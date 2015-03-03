@@ -72,7 +72,9 @@ void MainWindow::readSettings()
     conf.beginGroup("MainWindow");
     restoreState(conf.value("state", saveState()).toByteArray());
     restoreGeometry(conf.value("geometry", saveGeometry()).toByteArray());
-    ui->verticalSplitter->restoreState(conf.value("splitterState").toByteArray());
+    ui->verticalSplitter->restoreState(conf.value("vSplitterState").toByteArray());
+    ui->horizontalSplitter->restoreState(conf.value("hSplitterState").toByteArray());
+    ui->tabWidget->setCurrentIndex(conf.value("activeTab").toInt());
     conf.endGroup();
 
     conf.beginGroup("Account");
@@ -90,7 +92,9 @@ void MainWindow::writeSettings()
     conf.beginGroup("MainWindow");
     conf.setValue("state", saveState());
     conf.setValue("geometry", saveGeometry());
-    conf.setValue("splitterState", ui->verticalSplitter->saveState());
+    conf.setValue("vSplitterState", ui->verticalSplitter->saveState());
+    conf.setValue("hSplitterState", ui->horizontalSplitter->saveState());
+    conf.setValue("activeTab", ui->tabWidget->currentIndex());
     conf.endGroup();
 
     conf.beginGroup("Account");

@@ -1,6 +1,7 @@
 #include "flickrapi.h"
 
 #include <liboauthcpp/liboauthcpp.h>
+#include <QtCore/QEventLoop>
 #include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
@@ -13,6 +14,8 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
+#include <QtWebKitWidgets/QWebFrame>
+#include <QtWebKitWidgets/QWebPage>
 
 #include "photosetsmodel.h"
 #include "settings.h"
@@ -45,28 +48,42 @@ FlickrAPI::~FlickrAPI()
 
 void FlickrAPI::authenticate()
 {
+    netAccessManager->clearAccessCache();
+
     if (client)
         delete client;
 
     OAuth::Consumer *consumer = new OAuth::Consumer(API_KEY, API_SECRET);
     OAuth::Client oauth(consumer);
+    QEventLoop loop;
+
+    QWebPage webPage;
+    connect(&webPage, SIGNAL(loadFinished(bool)), &loop, SLOT(quit()));
 
     // 1
     std::string oAuthQueryString = oauth.getURLQueryString(OAuth::Http::Get, "https://www.flickr.com/services/oauth/request_token?oauth_callback=oob");
-    QDesktopServices::openUrl(QUrl(QString("https://www.flickr.com/services/oauth/request_token?") + QString(oAuthQueryString.c_str())));
-    QString requestTokenResp = QInputDialog::getText(0, tr("Request Token Response"), tr("Response:"), QLineEdit::Normal, "", 0, 0, Qt::ImhNone);
+    webPage.mainFrame()->load(QUrl(QString("https://www.flickr.com/services/oauth/request_token?") + QString(oAuthQueryString.c_str())));
+    loop.exec();
+
+    QString requestTokenResp = webPage.mainFrame()->toPlainText();
     OAuth::Token request_token = OAuth::Token::extract(requestTokenResp.toStdString());
 
     // 2
     QDesktopServices::openUrl(QUrl(QString("https://www.flickr.com/services/oauth/authorize?oauth_token=%1&perms=read").arg(request_token.key().c_str())));
-    QString pin = QInputDialog::getText(0, tr("PIN"), tr("PIN:"), QLineEdit::Normal, "", 0, 0, Qt::ImhNone);
+    bool ok;
+    QString pin = QInputDialog::getText(0, tr("PIN"), tr("PIN:"), QLineEdit::Normal, "", &ok, 0, Qt::ImhNone);
+    if (!ok)
+        return;
+
     request_token.setPin(pin.toStdString());
 
     // 3
     oauth = OAuth::Client(consumer, &request_token);
     oAuthQueryString = oauth.getURLQueryString(OAuth::Http::Get, "https://www.flickr.com/services/oauth/access_token", std::string(""), true);
-    QDesktopServices::openUrl(QUrl(QString("https://www.flickr.com/services/oauth/access_token?") + QString(oAuthQueryString.c_str())));
-    QString accessTokenResp = QInputDialog::getText(0, tr("Access Token Response"), tr("Response:"), QLineEdit::Normal, "", 0, 0, Qt::ImhNone);
+    webPage.mainFrame()->load(QUrl(QString("https://www.flickr.com/services/oauth/access_token?") + QString(oAuthQueryString.c_str())));
+    loop.exec();
+
+    QString accessTokenResp = webPage.mainFrame()->toPlainText();
     OAuth::KeyValuePairs accessTokenRespData = OAuth::ParseKeyValuePairs(accessTokenResp.toStdString());
     OAuth::Token *accessToken = new OAuth::Token(OAuth::Token::extract(accessTokenRespData));
 
@@ -143,6 +160,8 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
     {
         QString fName = reply->url().toString().split("/").last().split("_").first();
         fName = photosets->activeSet()->titleByID(fName);
+        fName.append("." + reply->url().toString().split(".").last());
+
         saveToDisk(fName, reply);
         pDialog->setValue(pDialog->value() + 1);
         reply->deleteLater();
@@ -228,7 +247,7 @@ void FlickrAPI::dowloadCanceled()
 
 void FlickrAPI::saveToDisk(QString fName, QIODevice *data)
 {
-    QFile file(photosets->activeSet()->folder() + "/" + fName + ".jpg");
+    QFile file(photosets->activeSet()->folder() + "/" + fName);
     file.open(QIODevice::WriteOnly);
     file.write(data->readAll());
     file.close();

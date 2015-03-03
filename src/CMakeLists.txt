@@ -35,6 +35,7 @@ target_link_libraries(flicqr
     ${Qt5Gui_LIBRARIES}
     ${Qt5Network_LIBRARIES}
     ${Qt5Widgets_LIBRARIES}
+    ${Qt5WebKitWidgets_LIBRARIES}
     ${liboauthcpp_LIBRARY})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}

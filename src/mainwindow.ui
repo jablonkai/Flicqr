@@ -31,7 +31,7 @@
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QSplitter" name="splitter">
+      <widget class="QSplitter" name="horizontalSplitter">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -46,18 +46,18 @@
          <bool>false</bool>
         </property>
        </widget>
-       <widget class="QTabWidget" name="responseTabWidget">
+       <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="infoTab">
          <attribute name="title">
-          <string>Page</string>
+          <string>Picture Info</string>
          </attribute>
         </widget>
-        <widget class="QWidget" name="responseTabWidget_2" native="true">
+        <widget class="QWidget" name="responseTab">
          <attribute name="title">
-          <string/>
+          <string>Response</string>
          </attribute>
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0" colspan="2">
