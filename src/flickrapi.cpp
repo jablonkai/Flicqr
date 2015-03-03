@@ -56,8 +56,8 @@ void FlickrAPI::authenticate()
     OAuth::Consumer *consumer = new OAuth::Consumer(API_KEY, API_SECRET);
     OAuth::Client oauth(consumer);
     QEventLoop loop;
-
     QWebPage webPage;
+
     connect(&webPage, SIGNAL(loadFinished(bool)), &loop, SLOT(quit()));
 
     // 1
@@ -225,12 +225,13 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
     else if (reqUrl.contains("method=flickr.photosets.getPhotos"))
     {
         jsonData = jsonObject.value("photoset").toObject();
+        Photoset *photoSet = photosets->byID(jsonData.value("id").toString());
         QJsonArray jsonArray = jsonData.value("photo").toArray();
 
         for (int i = 0; i < jsonArray.size(); ++i)
         {
             QJsonObject iObject = jsonArray[i].toObject();
-            photosets->activeSet()->addPhoto(new Photo(iObject["id"].toString(), iObject["title"].toString()));
+            photoSet->addPhoto(new Photo(iObject["id"].toString(), iObject["title"].toString()));
 //            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getInfo&photo_id=" + iObject["id"].toString().toStdString()).c_str()));
         }
         emit photoSetActivated(photosets->activeSet());
