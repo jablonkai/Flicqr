@@ -103,16 +103,12 @@ void FlickrAPI::authenticate()
 
 void FlickrAPI::getPhotosetsList()
 {
-//    netAccessManager->clearAccessCache();
     photosets->clear();
-
     sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getList").c_str()));
 }
 
 void FlickrAPI::downloadPhotoset(const QString &directory)
 {
-//    netAccessManager->clearAccessCache();
-
     if (photosets->activeSet() == NULL)
     {
         QMessageBox::warning(0, tr("Warning"), tr("Please select an album first!"));
@@ -128,13 +124,11 @@ void FlickrAPI::downloadPhotoset(const QString &directory)
     pDialog->show();
 
     foreach (Photo *photo, photos)
-        sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getSizes&photo_id=" + photo->id().toStdString()).c_str()));
+        sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getSizes&photo_id=" + photo->ID().toStdString()).c_str()));
 }
 
 void FlickrAPI::activated(const QModelIndex &index)
 {
-//    netAccessManager->clearAccessCache();
-
     photosets->activateSet(index);
     photosets->activeSet()->clear();
     sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getPhotos&photoset_id=" + photosets->activeSet()->ID().toStdString()).c_str()));
@@ -178,11 +172,37 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
         Settings::instance()->setUserID(jsonData.value("id").toString());
         Settings::instance()->setUserName(jsonData.value("username").toObject().value("_content").toString());
     }
-//    else if (reqUrl.contains("method=flickr.photos.getInfo"))
-//    {
-//        jsonData = jsonObject.value("photo").toObject();
-//        std::cout << "photo get info" << std::endl;
-//    }
+    else if (reqUrl.contains("method=flickr.photos.getInfo"))
+    {
+        jsonData = jsonObject.value("photo").toObject();
+        Photo *photo = photosets->activeSet()->byID(jsonData.value("id").toString());
+
+        if (photo != NULL)
+        {
+            photo->setDateTaken(QDateTime::fromString(jsonData.value("dates").toObject().value("taken").toString(), Qt::ISODate));
+            photo->setDateUploaded(QDateTime::fromTime_t(jsonData.value("dateuploaded").toString().toLongLong()));
+            photo->setDateUpdate(QDateTime::fromTime_t(jsonData.value("visibility").toObject().value("lastupdate").toString().toLongLong()));
+            photo->setPublic(jsonData.value("visibility").toObject().value("ispublic").toBool());
+            photo->setFriend(jsonData.value("visibility").toObject().value("isfriend").toBool());
+            photo->setFamily(jsonData.value("visibility").toObject().value("isfamily").toBool());
+//            photo->
+            /*
+    QString _id;
+    QString _title;
+    QString _format;  !!!
+    int _size;            !!!
+
+    QString _description;   !!!
+
+    QDateTime _taken;
+    QDateTime _uploaded;
+    QDateTime _update;
+
+    bool _isPublic;
+    bool _isFriend;
+    bool _isFamily;*/
+        }
+    }
     else if (reqUrl.contains("method=flickr.photos.getSizes"))
     {
         jsonData = jsonObject.value("sizes").toObject();
@@ -232,7 +252,7 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
         {
             QJsonObject iObject = jsonArray[i].toObject();
             photoSet->addPhoto(new Photo(iObject["id"].toString(), iObject["title"].toString()));
-//            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getInfo&photo_id=" + iObject["id"].toString().toStdString()).c_str()));
+            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getInfo&photo_id=" + iObject["id"].toString().toStdString()).c_str()));
         }
         emit photoSetActivated(photosets->activeSet());
     }

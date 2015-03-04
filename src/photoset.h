@@ -55,8 +55,11 @@ public:
     void setFolder(const QString &_folder) { localFolder = _folder; }
     QString folder() const { return localFolder; }
 
+    Photo *byID(const QString _id) const { foreach(Photo *photo, photos) if (photo->ID() == _id) return photo; return 0; }
+
+    QString titleByID(const QString _id) const { foreach(Photo *photo, photos) if(photo->ID() == _id) return photo->title(); return 0; }
+
     QList<Photo*> photoList() const { return photos; }
-    QString titleByID(const QString _id) const { foreach(Photo *photo, photos) if(photo->id() == _id) return photo->title(); return 0; }
 
 private:
     QString _id;

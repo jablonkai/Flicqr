@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(flickrAPI, SIGNAL(sendResponse(QString)), ui->responseTextEdit, SLOT(setText(QString)));
     connect(flickrAPI, SIGNAL(photoSetActivated(Photoset*)), this, SLOT(photoSetActivated(Photoset*)));
     connect(ui->photosetsView, SIGNAL(activated(QModelIndex)), flickrAPI, SLOT(activated(QModelIndex)));
+    connect(ui->photosView, SIGNAL(activated(QModelIndex)), flickrAPI, SLOT(photoActivated(QModelIndex)));
 
     show();
 }

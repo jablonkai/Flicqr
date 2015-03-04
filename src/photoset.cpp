@@ -58,7 +58,7 @@ QString Photoset::currentID(const QModelIndex &index) const
     if (!index.isValid() || index.row() >= photos.size())
         return QString();
 
-    return photos.at(index.row())->id();
+    return photos.at(index.row())->ID();
 }
 
 void Photoset::clear()

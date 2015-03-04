@@ -15,10 +15,11 @@ set(Flicqr_SRCS
 set(Flicqr_MOC_HDRS
     flickrapi.h
     mainwindow.h
-    photo.h
+#    photo.h
     photoset.h
     photosetsmodel.h
-    settings.h)
+#    settings.h
+)
 set(Flicqr_UIS
     mainwindow.ui)
 
