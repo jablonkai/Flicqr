@@ -50,9 +50,6 @@ void FlickrAPI::authenticate()
 {
     netAccessManager->clearAccessCache();
 
-    if (client)
-        delete client;
-
     OAuth::Consumer *consumer = new OAuth::Consumer(API_KEY, API_SECRET);
     OAuth::Client oauth(consumer);
     QEventLoop loop;
@@ -90,6 +87,8 @@ void FlickrAPI::authenticate()
     Settings::instance()->setOauthTokenKey(accessToken->key().c_str());
     Settings::instance()->setOauthTokenSecret(accessToken->secret().c_str());
 
+    if (client)
+        delete client;
     client = new OAuth::Client(consumer, accessToken);
 
     oAuthQueryString = client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.test.login");
