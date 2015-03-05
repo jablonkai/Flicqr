@@ -103,6 +103,12 @@ void FlickrAPI::authenticate()
 
 void FlickrAPI::getPhotosetsList()
 {
+    pDialog = new QProgressDialog(tr("downloading album list..."), tr("Cancel"), 1, 100);
+    pDialog->setWindowModality(Qt::ApplicationModal);
+    pDialog->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
+    pDialog->setCancelButton(0);
+    pDialog->show();
+
     photosets->clear();
     sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getList").c_str()));
 }
@@ -129,6 +135,8 @@ void FlickrAPI::downloadPhotoset(const QString &directory)
 
 void FlickrAPI::activated(const QModelIndex &index)
 {
+    netAccessManager->clearAccessCache();
+
     photosets->activateSet(index);
     photosets->activeSet()->clear();
     sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getPhotos&photoset_id=" + photosets->activeSet()->ID().toStdString()).c_str()));
@@ -229,11 +237,14 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
         photoSet->setDescription(jsonData.value("description").toObject().value("_content").toString());
         photoSet->setCreatedDate(QDateTime::fromTime_t(jsonData.value("date_create").toString().toLongLong()));
         photoSet->setUpdatedDate(QDateTime::fromTime_t(jsonData.value("date_update").toString().toLongLong()));
+
+        pDialog->setValue(pDialog->value() + 1);
     }
     else if (reqUrl.contains("method=flickr.photosets.getList"))
     {
         jsonData = jsonObject.value("photosets").toObject();
         QJsonArray jsonArray = jsonData.value("photoset").toArray();
+        pDialog->setMaximum(jsonArray.size());
 
         for (int i = 0; i < jsonArray.size(); ++i)
         {

@@ -15,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     readSettings();
+    show();
+
     flickrAPI = new FlickrAPI(this);
     ui->photosetsView->setModel(flickrAPI->photosetsModel());
 
@@ -24,8 +26,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(flickrAPI, SIGNAL(photoSetActivated(Photoset*)), this, SLOT(photoSetActivated(Photoset*)));
     connect(ui->photosetsView, SIGNAL(activated(QModelIndex)), flickrAPI, SLOT(activated(QModelIndex)));
     connect(ui->photosView, SIGNAL(activated(QModelIndex)), flickrAPI, SLOT(photoActivated(QModelIndex)));
-
-    show();
 }
 
 MainWindow::~MainWindow()
