@@ -16,8 +16,11 @@ public:
     void setTitle(const QString &__title) { _title = __title; }
     QString title() const { return _title; }
 
-    void setSize(const int &s) { _size = s; }
-    int size() const { return _size; }
+    void setFormat(const QString &f) { _format = f; }
+    QString format() const { return _format; }
+
+    void setDescription(const QString &desc) { _description = desc; }
+    QString description() const { return _description; }
 
     void setDateTaken(const QDateTime &t) { _taken = t; }
     QDateTime dateTaken() const { return _taken; }
@@ -41,7 +44,6 @@ private:
     QString _id;
     QString _title;
     QString _format;
-    int _size;
 
     QString _description;
 
@@ -55,88 +57,3 @@ private:
 };
 
 #endif // PHOTO_H
-/*{
-    "photo": {
-        "comments": {
-            "_content": "0"
-        },
-        "dates": {
-            "lastupdate": "1424471561",
-            "posted": "1418031908",
-            "taken": "2014-12-07 15:13:31",
-            "takengranularity": "0",
-            "takenunknown": "0"
-        },
-        "dateuploaded": "1418031908",
-        "description": {
-            "_content": ""
-        },
-        "editability": {
-            "canaddmeta": 1,
-            "cancomment": 1
-        },
-        "farm": 8,
-        "id": "15788651237",
-        "isfavorite": 0,
-        "license": "0",
-        "media": "photo",
-        "notes": {
-            "note": [
-            ]
-        },
-        "originalformat": "jpg",
-        "originalsecret": "4723d34c11",
-        "owner": {
-            "iconfarm": 0,
-            "iconserver": "0",
-            "location": "",
-            "nsid": "23924687@N08",
-            "path_alias": "jablonkaitamas",
-            "realname": "",
-            "username": "Jablonkai Tamás"
-        },
-        "people": {
-            "haspeople": 0
-        },
-        "permissions": {
-            "permaddmeta": 2,
-            "permcomment": 3
-        },
-        "publiceditability": {
-            "canaddmeta": 0,
-            "cancomment": 1
-        },
-        "rotation": 0,
-        "safety_level": "0",
-        "secret": "01476d09c3",
-        "server": "7509",
-        "tags": {
-            "tag": [
-            ]
-        },
-        "title": {
-            "_content": "DSC02661"
-        },
-        "urls": {
-            "url": [
-                {
-                    "_content": "https://www.flickr.com/photos/jablonkaitamas/15788651237/",
-                    "type": "photopage"
-                }
-            ]
-        },
-        "usage": {
-            "canblog": 1,
-            "candownload": 1,
-            "canprint": 1,
-            "canshare": 1
-        },
-        "views": "4",
-        "visibility": {
-            "isfamily": 0,
-            "isfriend": 0,
-            "ispublic": 0
-        }
-    },
-    "stat": "ok"
-}*/

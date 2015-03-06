@@ -186,28 +186,14 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 
         if (photo != NULL)
         {
+            photo->setFormat(jsonData.value("originalformat").toString());
+            photo->setDescription(jsonData.value("description").toObject().value("_content").toString());
             photo->setDateTaken(QDateTime::fromString(jsonData.value("dates").toObject().value("taken").toString(), Qt::ISODate));
             photo->setDateUploaded(QDateTime::fromTime_t(jsonData.value("dateuploaded").toString().toLongLong()));
             photo->setDateUpdate(QDateTime::fromTime_t(jsonData.value("visibility").toObject().value("lastupdate").toString().toLongLong()));
             photo->setPublic(jsonData.value("visibility").toObject().value("ispublic").toBool());
             photo->setFriend(jsonData.value("visibility").toObject().value("isfriend").toBool());
             photo->setFamily(jsonData.value("visibility").toObject().value("isfamily").toBool());
-//            photo->
-            /*
-    QString _id;
-    QString _title;
-    QString _format;  !!!
-    int _size;            !!!
-
-    QString _description;   !!!
-
-    QDateTime _taken;
-    QDateTime _uploaded;
-    QDateTime _update;
-
-    bool _isPublic;
-    bool _isFriend;
-    bool _isFamily;*/
         }
     }
     else if (reqUrl.contains("method=flickr.photos.getSizes"))
@@ -231,8 +217,16 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
         jsonData = jsonObject.value("photoset").toObject();
         Photoset *photoSet = photosets->byID(jsonData.value("id").toString());
 
-        photoSet->setPhotoCount(jsonData.value("count_photos").toInt());
-        photoSet->setVideoCount(jsonData.value("count_videos").toInt());
+        if (jsonData.value("count_photos").type() == QJsonValue::Double)
+            photoSet->setPhotoCount(jsonData.value("count_photos").toInt());
+        else if (jsonData.value("count_photos").type() == QJsonValue::String)
+            photoSet->setPhotoCount(jsonData.value("count_photos").toString().toInt());
+
+        if (jsonData.value("count_videos").type() == QJsonValue::Double)
+            photoSet->setVideoCount(jsonData.value("count_videos").toInt());
+        else if (jsonData.value("count_videos").type() == QJsonValue::String)
+            photoSet->setVideoCount(jsonData.value("count_videos").toString().toInt());
+
         photoSet->setDescription(jsonData.value("description").toObject().value("_content").toString());
         photoSet->setCreatedDate(QDateTime::fromTime_t(jsonData.value("date_create").toString().toLongLong()));
         photoSet->setUpdatedDate(QDateTime::fromTime_t(jsonData.value("date_update").toString().toLongLong()));

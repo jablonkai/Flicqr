@@ -14,7 +14,7 @@ QVariant Photoset::data(const QModelIndex &index, int role) const
         if (index.column() == 0)
             return photos.at(index.row())->title();
         else if (index.column() == 1)
-            return QString("%1 KiB").arg(photos.at(index.row())->size());
+            return photos.at(index.row())->format();
         else if (index.column() == 2)
             return photos.at(index.row())->dateTaken();
     }
@@ -31,7 +31,7 @@ QVariant Photoset::headerData(int section, Qt::Orientation orientation, int role
         if (section == 0)
             return tr("Title");
         else if (section == 1)
-            return tr("Size");
+            return tr("Format");
         else if (section == 2)
             return tr("Taken");
     else

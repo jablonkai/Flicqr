@@ -77,32 +77,3 @@ private:
 };
 
 #endif // PHOTOSET_H
-
-/*{
-    "photoset": {
-        "can_comment": 1,
-        "count_comments": "0",
-        "count_photos": "16",
-        "count_videos": 0,
-        "count_views": "1",
-        "coverphoto_farm": 0,
-        "coverphoto_server": "0",
-        "date_create": "1263592174",
-        "date_update": "1412715273",
-        "description": {
-            "_content": ""
-        },
-        "farm": 5,
-        "id": "72157623217139176",
-        "owner": "23924687@N08",
-        "photos": 16,
-        "primary": "4276831181",
-        "secret": "f743edb86b",
-        "server": "4010",
-        "title": {
-            "_content": "home"
-        },
-        "username": "Jablonkai Tamás"
-    },
-    "stat": "ok"
-}*/
