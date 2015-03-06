@@ -18,12 +18,16 @@ namespace OAuth {
 class Client;
 }
 
+namespace Ui {
+class MainWindow;
+}
+
 class FlickrAPI : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit FlickrAPI(QObject *parent = 0);
+    explicit FlickrAPI(QObject *parent = 0, Ui::MainWindow *_ui = 0);
     ~FlickrAPI();
 
     PhotosetsModel *photosetsModel() const { return photosets; }
@@ -47,6 +51,7 @@ private slots:
     void dowloadCanceled();
 
 private:
+    Ui::MainWindow *ui;
     QNetworkAccessManager *netAccessManager;
     QProgressDialog *pDialog;
     OAuth::Client *client;

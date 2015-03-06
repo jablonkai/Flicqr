@@ -19,9 +19,10 @@
 
 #include "photosetsmodel.h"
 #include "settings.h"
+#include "ui_mainwindow.h"
 
-FlickrAPI::FlickrAPI(QObject *parent) :
-    QObject(parent), pDialog(NULL)
+FlickrAPI::FlickrAPI(QObject *parent, Ui::MainWindow *_ui) :
+    QObject(parent), ui(_ui), pDialog(NULL)
 {
     netAccessManager = new QNetworkAccessManager(this);
     photosets = new PhotosetsModel;
@@ -143,7 +144,18 @@ void FlickrAPI::activated(const QModelIndex &index)
 
 void FlickrAPI::photoActivated(const QModelIndex &index)
 {
-//    netAccessManager->clearAccessCache();
+    Photo *photo = photosets->activeSet()->selected(index);
+
+    ui->titleLabel->setText(photo->title());
+    ui->descriptionTextBrowser->setText(photo->description());
+    ui->takenLabel->setText(QString("Taken: %1").arg(photo->dateTaken().toString()));
+    ui->uploadedLabel->setText(QString("Uploaded: %1").arg(photo->dateUploaded().toString()));
+    ui->updateLabel->setText(QString("Updated: %1").arg(photo->dateUpdate().toString()));
+    ui->publicCheckBox->setChecked(photo->isPublic());
+    ui->friendsCheckBox->setChecked(photo->isFriend());
+    ui->familyCheckBox->setChecked(photo->isFamily());
+
+    sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getSizes&photo_id=" + photo->ID().toStdString()).c_str()));
 }
 
 void FlickrAPI::sendRequest(const QString &request)
@@ -157,7 +169,7 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 {
     QString reqUrl = reply->url().toString();
 
-    if (reqUrl.contains("staticflickr"))
+    if (reqUrl.contains("staticflickr") && pDialog->isActiveWindow())
     {
         QString fName = reply->url().toString().split("/").last().split("_").first();
         fName = photosets->activeSet()->titleByID(fName);

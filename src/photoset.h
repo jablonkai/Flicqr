@@ -56,6 +56,7 @@ public:
     QString folder() const { return localFolder; }
 
     Photo *byID(const QString _id) const { foreach(Photo *photo, photos) if (photo->ID() == _id) return photo; return 0; }
+    Photo *selected(const QModelIndex &index) const;
 
     QString titleByID(const QString _id) const { foreach(Photo *photo, photos) if(photo->ID() == _id) return photo->title(); return 0; }
 

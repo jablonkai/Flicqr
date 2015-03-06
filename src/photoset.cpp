@@ -71,3 +71,8 @@ void Photoset::addPhoto(Photo *photo)
     insertRows(rowCount(QModelIndex()), 1);
     photos.append(photo);
 }
+
+Photo *Photoset::selected(const QModelIndex &index) const
+{
+    return photos.at(index.row());
+}
