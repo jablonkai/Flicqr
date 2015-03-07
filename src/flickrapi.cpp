@@ -21,6 +21,8 @@
 #include "settings.h"
 #include "ui_mainwindow.h"
 
+#include <iostream>
+
 FlickrAPI::FlickrAPI(QObject *parent, Ui::MainWindow *_ui) :
     QObject(parent), ui(_ui), pDialog(NULL)
 {
@@ -203,9 +205,11 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
             photo->setDateTaken(QDateTime::fromString(jsonData.value("dates").toObject().value("taken").toString(), Qt::ISODate));
             photo->setDateUploaded(QDateTime::fromTime_t(jsonData.value("dateuploaded").toString().toLongLong()));
             photo->setDateUpdate(QDateTime::fromTime_t(jsonData.value("visibility").toObject().value("lastupdate").toString().toLongLong()));
-            photo->setPublic(jsonData.value("visibility").toObject().value("ispublic").toBool());
-            photo->setFriend(jsonData.value("visibility").toObject().value("isfriend").toBool());
-            photo->setFamily(jsonData.value("visibility").toObject().value("isfamily").toBool());
+            photo->setPublic(jsonData.value("visibility").toObject().value("ispublic").toInt());
+            photo->setFriend(jsonData.value("visibility").toObject().value("isfriend").toInt());
+            photo->setFamily(jsonData.value("visibility").toObject().value("isfamily").toInt());
+
+//            std::cout << jsonData.value("title").toObject().value("_content").toString().toStdString() << "  " << jsonData.value("visibility").toObject().value("ispublic").toInt() << std::endl;
         }
     }
     else if (reqUrl.contains("method=flickr.photos.getSizes"))
