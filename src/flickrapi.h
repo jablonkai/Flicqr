@@ -11,12 +11,12 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QProgressDialog;
 
-class Photoset;
-class PhotosetsModel;
-
 namespace OAuth {
 class Client;
 }
+
+class Photoset;
+class PhotosetsModel;
 
 namespace Ui {
 class MainWindow;
@@ -57,6 +57,7 @@ private:
     OAuth::Client *client;
     QString flickrRestUrl;
     PhotosetsModel *photosets;
+    bool albumDownloading;
 
     void saveToDisk(QString fName, QIODevice *data);
 };

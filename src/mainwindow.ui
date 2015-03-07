@@ -149,7 +149,7 @@
            </widget>
           </item>
           <item row="0" column="2" rowspan="2">
-           <widget class="QFrame" name="previewFrame">
+           <widget class="QLabel" name="pictureLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -162,11 +162,8 @@
               <height>150</height>
              </size>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
+            <property name="text">
+             <string/>
             </property>
            </widget>
           </item>
@@ -178,7 +175,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>127</height>
+              <height>192</height>
              </size>
             </property>
            </spacer>

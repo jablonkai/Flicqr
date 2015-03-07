@@ -10,6 +10,7 @@
 #include <QtGui/QDesktopServices>
 #include <QtGui/QInputDialog>
 #include <QtGui/QMessageBox>
+#include <QtGui/QImage>
 #include <QtGui/QProgressDialog>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -20,8 +21,6 @@
 #include "photosetsmodel.h"
 #include "settings.h"
 #include "ui_mainwindow.h"
-
-#include <iostream>
 
 FlickrAPI::FlickrAPI(QObject *parent, Ui::MainWindow *_ui) :
     QObject(parent), ui(_ui), pDialog(NULL)
@@ -131,6 +130,7 @@ void FlickrAPI::downloadPhotoset(const QString &directory)
     pDialog->setWindowModality(Qt::ApplicationModal);
     pDialog->show();
 
+    albumDownloading = true;
     foreach (Photo *photo, photos)
         sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getSizes&photo_id=" + photo->ID().toStdString()).c_str()));
 }
@@ -157,6 +157,7 @@ void FlickrAPI::photoActivated(const QModelIndex &index)
     ui->friendsCheckBox->setChecked(photo->isFriend());
     ui->familyCheckBox->setChecked(photo->isFamily());
 
+    albumDownloading = false;
     sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getSizes&photo_id=" + photo->ID().toStdString()).c_str()));
 }
 
@@ -171,7 +172,7 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 {
     QString reqUrl = reply->url().toString();
 
-    if (reqUrl.contains("staticflickr") && pDialog->isActiveWindow())
+    if (reqUrl.contains("staticflickr") && albumDownloading)
     {
         QString fName = reply->url().toString().split("/").last().split("_").first();
         fName = photosets->activeSet()->titleByID(fName);
@@ -179,6 +180,16 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 
         saveToDisk(fName, reply);
         pDialog->setValue(pDialog->value() + 1);
+        reply->deleteLater();
+        return;
+    }
+    else if (reqUrl.contains("staticflickr") && !albumDownloading)
+    {
+        QImage image;
+        image.load(reply, "JPG");
+        ui->pictureLabel->setPixmap(QPixmap::fromImage(image));
+        ui->pictureLabel->repaint();
+
         reply->deleteLater();
         return;
     }
@@ -208,8 +219,6 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
             photo->setPublic(jsonData.value("visibility").toObject().value("ispublic").toInt());
             photo->setFriend(jsonData.value("visibility").toObject().value("isfriend").toInt());
             photo->setFamily(jsonData.value("visibility").toObject().value("isfamily").toInt());
-
-//            std::cout << jsonData.value("title").toObject().value("_content").toString().toStdString() << "  " << jsonData.value("visibility").toObject().value("ispublic").toInt() << std::endl;
         }
     }
     else if (reqUrl.contains("method=flickr.photos.getSizes"))
@@ -217,16 +226,32 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
         jsonData = jsonObject.value("sizes").toObject();
         QJsonArray jsonArray = jsonData.value("size").toArray();
 
-        for (int i = 0; i < jsonArray.size(); ++i)
-            if (jsonArray[i].toObject().value("label").toString() == "Original")
-            {
-                QString source = jsonArray[i].toObject().value("source").toString();
-                sendRequest(source);
+        if (albumDownloading)
+        {
+            for (int i = 0; i < jsonArray.size(); ++i)
+                if (jsonArray[i].toObject().value("label").toString() == "Original")
+                {
+                    QString source = jsonArray[i].toObject().value("source").toString();
+                    sendRequest(source);
 
-                reply->deleteLater();
-                emit sendResponse(QString::fromUtf8(jsonDocument.toJson()));
-                return;
-            }
+                    emit sendResponse(QString::fromUtf8(jsonDocument.toJson()));
+                    reply->deleteLater();
+                    return;
+                }
+        }
+        else
+        {
+            for (int i = 0; i < jsonArray.size(); ++i)
+                if (jsonArray[i].toObject().value("label").toString() == "Large Square")
+                {
+                    QString source = jsonArray[i].toObject().value("source").toString();
+                    sendRequest(source);
+
+                    emit sendResponse(QString::fromUtf8(jsonDocument.toJson()));
+                    reply->deleteLater();
+                    return;
+                }
+        }
     }
     else if (reqUrl.contains("method=flickr.photosets.getInfo"))
     {
