@@ -116,6 +116,8 @@ void FlickrAPI::getPhotosetsList()
 
 void FlickrAPI::downloadPhotoset(const QString &directory)
 {
+    netAccessManager->clearAccessCache();
+
     if (photosets->activeSet() == NULL)
     {
         QMessageBox::warning(0, tr("Warning"), tr("Please select an album first!"));
@@ -180,6 +182,7 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
 
         saveToDisk(fName, reply);
         pDialog->setValue(pDialog->value() + 1);
+
         reply->deleteLater();
         return;
     }
@@ -286,6 +289,22 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
             photosets->addPhotoset(new Photoset(iObject["id"].toString(), iObject["title"].toObject().value("_content").toString()));
             sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getInfo&photoset_id=" + iObject["id"].toString().toStdString()).c_str()));
         }
+
+        int page;
+        int pages;
+
+        if (jsonData.value("page").type() == QJsonValue::Double)
+            page = jsonData.value("page").toInt();
+        else if (jsonData.value("page").type() == QJsonValue::String)
+            page = jsonData.value("page").toString().toInt();
+
+        if (jsonData.value("pages").type() == QJsonValue::Double)
+            pages = jsonData.value("pages").toInt();
+        else if (jsonData.value("pages").type() == QJsonValue::String)
+            pages = jsonData.value("pages").toString().toInt();
+
+        if (pages != page)
+            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getList" + "&page=" + QString("%1").arg(page + 1).toStdString()).c_str()));
     }
     else if (reqUrl.contains("method=flickr.photosets.getPhotos"))
     {
@@ -299,6 +318,23 @@ void FlickrAPI::parseNetworkReply(QNetworkReply *reply)
             photoSet->addPhoto(new Photo(iObject["id"].toString(), iObject["title"].toString()));
             sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photos.getInfo&photo_id=" + iObject["id"].toString().toStdString()).c_str()));
         }
+
+        int page;
+        int pages;
+
+        if (jsonData.value("page").type() == QJsonValue::Double)
+            page = jsonData.value("page").toInt();
+        else if (jsonData.value("page").type() == QJsonValue::String)
+            page = jsonData.value("page").toString().toInt();
+
+        if (jsonData.value("pages").type() == QJsonValue::Double)
+            pages = jsonData.value("pages").toInt();
+        else if (jsonData.value("pages").type() == QJsonValue::String)
+            pages = jsonData.value("pages").toString().toInt();
+
+        if (pages != page)
+            sendRequest(flickrRestUrl + QString(client->getURLQueryString(OAuth::Http::Get, flickrRestUrl.toStdString() + "method=flickr.photosets.getPhotos&photoset_id=" + photosets->activeSet()->ID().toStdString() + "&page=" + QString("%1").arg(page + 1).toStdString()).c_str()));
+
         emit photoSetActivated(photosets->activeSet());
     }
 
