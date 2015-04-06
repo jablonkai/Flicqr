@@ -154,7 +154,7 @@ void FlickrAPI::photoActivated(const QModelIndex &index)
     ui->descriptionTextBrowser->setText(photo->description());
     ui->takenLabel->setText(QString("Taken: %1").arg(photo->dateTaken().toString()));
     ui->uploadedLabel->setText(QString("Uploaded: %1").arg(photo->dateUploaded().toString()));
-    ui->updateLabel->setText(QString("Updated: %1").arg(photo->dateUpdate().toString()));
+    ui->updateLabel->setText(QString("Updated: %1").arg(QDateTime::fromTime_t(0) == photo->dateUpdate() ? tr("never") : photo->dateUpdate().toString()));
     ui->publicCheckBox->setChecked(photo->isPublic());
     ui->friendsCheckBox->setChecked(photo->isFriend());
     ui->familyCheckBox->setChecked(photo->isFamily());
